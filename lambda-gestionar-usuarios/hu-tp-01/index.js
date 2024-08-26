@@ -39,7 +39,7 @@ async function createUser(event) {
 
         // Parámetros para la creación del usuario
         const params = {
-            ClientId: '3vtti4k65ef7qi9inqqa5911f7', // Reemplaza con tu App Client ID
+            ClientId: '3vtti4k65ef7qi9inqqa5911f7', // App Client ID
             Username: username,
             Password: password,
             UserAttributes: [
@@ -48,7 +48,7 @@ async function createUser(event) {
                     Value: email,
                 },
                 {
-                    Name: 'nickname', // Agregar el atributo obligatorio "nickName"
+                    Name: 'nickname', // atributo nickname
                     Value: username,
                 }
             ]
@@ -97,13 +97,13 @@ async function confirmEmail(event) {
 }
 
 async function login(event) {
-    // Aquí puedes implementar la lógica de inicio de sesión
+    // logica de inicio de sesión
     try {
         const { username, password } = JSON.parse(event.body);
 
         const params = {
             AuthFlow: 'USER_PASSWORD_AUTH',
-            ClientId: '3vtti4k65ef7qi9inqqa5911f7', // Reemplaza con tu App Client ID
+            ClientId: '3vtti4k65ef7qi9inqqa5911f7', // App Client ID
             AuthParameters: {
                 USERNAME: username,
                 PASSWORD: password,
