@@ -11,17 +11,25 @@ const pool = new pkg.Pool({
   }
 })
  
-const table_name = "t_users_tmp"
-const column_id = "user_id"
- 
-export const handler = async (event) => {
-        const id = event.queryStringParameters?.user_id
-        //  const estado = event.queryStringParameters?.estado
-        const query = `UPDATE ${table_name} SET status = TRUE WHERE ${column_id} = $1`
-        const res = await pool.query(query, [id]);
+const table_name = "t_staff_tmp"
+const column_id = "staff_id"
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ message: `User ${id} enabled successfully.`}),
-        };
+export const handler = async (event) => {
+    const id = event.queryStringParameters?.staff_id
+
+    // Actualiza el estado de activado (status = TRUE) del registro
+    const query = `UPDATE ${table_name} SET status = TRUE WHERE ${column_id} = $1`
+    
+    const res = await pool.query(query, [id]);
+    
+    return {
+        statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+            'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+        },
+      
+        body: JSON.stringify({ message: `Staff member ${id} enabled successfully.`}),
+    };
 };
