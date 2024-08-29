@@ -45,6 +45,11 @@ export const handler = async (event, context) => {
             if (!id_producto || isNaN(Number(id_producto))) {
               return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: "El ID del producto es requerido y debe ser un número válido." }),
               };
             }
@@ -56,12 +61,22 @@ export const handler = async (event, context) => {
             if (result.rowCount === 0) {
               return {
                 statusCode: 404,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: 'Producto no encontrado.' }),
               };
             }
 
             return {
               statusCode: 200,
+              headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
               body: JSON.stringify(result.rows[0]), // Retorna el primer (y único) resultado
             };
           }
@@ -72,23 +87,38 @@ export const handler = async (event, context) => {
             if (!search) {
               return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: "Los caracteres son requeridos" }),
               };
             }
             // Buscar productos con location_id nulo y nombre que coincida con la búsqueda
-            const sql = "SELECT * FROM t_products WHERE location_id IS NULL AND name_product LIKE $1";
+            const sql = "SELECT * FROM t_products WHERE location_id IS NULL AND name_product ILIKE $1";
             const result = await query(sql, [`%${search}%`]);
 
             // Si devuelve 0 filas acabar y mostrar un mensaje
             if (result.rowCount === 0) {
               return {
                 statusCode: 404,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: 'No se encontraron productos que coincidan con la búsqueda.' }),
               };
             }
 
             return {
               statusCode: 200,
+              headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
               body: JSON.stringify(result.rows), // Retorna todos los productos que coincidan
             };
           }
@@ -100,6 +130,11 @@ export const handler = async (event, context) => {
             const results = await query(sql);
             return {
               statusCode: 200,
+              headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
               body: JSON.stringify(results.rows),// Retorna todas sedes que coincidan
             };
           } else if (path.endsWith('/withoutlocations')) {
@@ -108,6 +143,11 @@ export const handler = async (event, context) => {
             const results = await query(sql);
             return {
               statusCode: 200,
+              headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
               body: JSON.stringify(results.rows),// Retorna todos los productos sin sede que coincidan
             };
           } else if (path.endsWith('/typeproduct')) {
@@ -116,11 +156,21 @@ export const handler = async (event, context) => {
             const results = await query(sql);
             return {
               statusCode: 200,
+              headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
               body: JSON.stringify(results.rows), // Retorna todos los tipos de productos
             };
           } else {
             return {
               statusCode: 404,
+              headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
               body: JSON.stringify({ message: "Ruta no encontrada." }),
             };
           }
@@ -141,6 +191,11 @@ export const handler = async (event, context) => {
             if (!id_product || isNaN(Number(id_product))) {
               return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: "El ID del producto es requerido y debe ser un número válido." }),
               };
             }
@@ -148,25 +203,41 @@ export const handler = async (event, context) => {
             if (!nueva_sede) {
               return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: "La nueva sede es requerida." }),
               };
             }
 
             // Actualizar la sede del producto
-            const sql = "UPDATE t_products SET location_id = $1 WHERE id_product = $2 RETURNING *";
+            const sql = "UPDATE t_products SET location_id = $1, created_at = NOW() AT TIME ZONE 'America/Lima' WHERE id_product = $2 RETURNING *";
             const result = await query(sql, [nueva_sede, id_product]);
 
             // Si devuelve 0 filas acabar y mostrar un mensaje
             if (result.rowCount === 0) {
               return {
                 statusCode: 404,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: 'Producto no encontrado.' }),
               };
             }
 
             return {
               statusCode: 200,
-              body: JSON.stringify({ message: 'Se actualizó la sede del producto correctamente.' }),
+              headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
+              body: JSON.stringify({ message: 'Se actualizó la sede del producto correctamente.',
+                                    body: result.rows}),
             };
           }
         }
@@ -175,6 +246,11 @@ export const handler = async (event, context) => {
       default: {
         return {
           statusCode: 405,
+          headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
           body: JSON.stringify({ message: 'Método no permitido.' }),
         };
       }
@@ -182,6 +258,11 @@ export const handler = async (event, context) => {
   } catch (err) {
     return {
       statusCode: 500,
+      headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
       body: JSON.stringify({ message: 'Error: ' + err.message }),
     };
   }
