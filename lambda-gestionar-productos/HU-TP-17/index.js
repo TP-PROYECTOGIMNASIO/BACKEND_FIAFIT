@@ -13,8 +13,10 @@ const pool = new pkg.Pool({
 });
 
 
+
 export const handler = async (event) => {
   try {
+    // consigue el id
     const productTypeId = event.queryStringParameters?.product_type_id;
 
     let query;
@@ -30,16 +32,27 @@ export const handler = async (event) => {
     }
 
     const result = await pool.query(query, values);
+    
 
     if (result.rows.length === 0) {
       return {
         statusCode: 404,
+        headers: {
+            'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+            'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+        },
         body: JSON.stringify({ message: 'Tipo de producto no encontrado' }),
       };
     }
 
     return {
       statusCode: 200,
+      headers: {
+          'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+          'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+          'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+      },
       body: JSON.stringify(result.rows),
     };
   } catch (err) {
@@ -47,6 +60,11 @@ export const handler = async (event) => {
 
     return {
       statusCode: 500,
+      headers: {
+          'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+          'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+          'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+      },
       body: JSON.stringify({ error: 'Internal Server Error' }),
     };
   }
