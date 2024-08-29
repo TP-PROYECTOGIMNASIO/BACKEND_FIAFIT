@@ -2,6 +2,45 @@ import pkg from 'pg';
 const { Client } = pkg;
 
 export const handler = async (event) => {
+    // Verificar el método HTTP
+    const method = event.httpMethod;
+    let requestBody;
+
+    if (method === 'POST') {
+        // Verificar si el cuerpo de la solicitud está vacío
+        if (!event.body) {
+            return {
+                statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT',
+                },
+                body: JSON.stringify({ message: 'El cuerpo de la solicitud no puede estar vacío' }),
+            };
+        }
+
+        // Parsear el cuerpo de la solicitud si está en formato JSON
+        if (typeof event.body === 'string') {
+            requestBody = JSON.parse(event.body);
+        } else {
+            requestBody = event.body;
+        }
+    } else if (method === 'GET') {
+        // Si es un GET, no se espera un cuerpo en la solicitud
+        requestBody = event.queryStringParameters || {};
+    } else {
+        return {
+            statusCode: 405,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT',
+            },
+            body: JSON.stringify({ message: 'Método no permitido' }),
+        };
+    }
+
     // Configuración de conexión a la base de datos PostgreSQL
     const client = new Client({
         host: 'rd-fiafit.cpokqowou7pv.us-east-2.rds.amazonaws.com',
@@ -10,20 +49,12 @@ export const handler = async (event) => {
         password: 'JYAnicito23$',
         database: 'postgres',
         ssl: {
-            rejectUnauthorized: false
-        }
+            rejectUnauthorized: false,
+        },
     });
 
     // Conectar a la base de datos
     await client.connect();
-
-    // Parsear el cuerpo de la solicitud si está en formato JSON
-    let requestBody;
-    if (typeof event.body === 'string') {
-        requestBody = JSON.parse(event.body);
-    } else {
-        requestBody = event.body;
-    }
 
     // Extraer las variables relevantes del cuerpo de la solicitud
     const { action, reportId, image, name, purchaseDate, totalPrice, product_type_id, description, quantity, purchaseReceipt, report_product_id } = requestBody;
