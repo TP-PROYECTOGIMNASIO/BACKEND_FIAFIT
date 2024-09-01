@@ -1,8 +1,7 @@
 {
-  "name": "hu-tp-73",
+  "name": "login",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,7 +9,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "node-fetch": "^3.3.2",
-    "pg": "^8.12.0"
+    "aws-sdk": "^2.1682.0"
   }
 }

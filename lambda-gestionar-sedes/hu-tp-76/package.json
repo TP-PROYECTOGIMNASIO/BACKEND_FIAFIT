@@ -1,16 +1,17 @@
 {
-  "name": "hu-tp-73",
+  "name": "hu-tp-76",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "node-fetch": "^3.3.2",
+    "aws-sdk": "^2.1685.0",
     "pg": "^8.12.0"
   }
 }

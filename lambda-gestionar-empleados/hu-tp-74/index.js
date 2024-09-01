@@ -12,41 +12,40 @@ const pool = new pkg.Pool({
   }
 });
 
-const table_name = "empleados";
+// Nombre de la tabla de la base de datos
+const table_name = "t_staff";
 
 export const handler = async (event) => {
     
     const { httpMethod, queryStringParameters } = event;
     
+    // Verifica si el metodo HTTP es GET
     if (httpMethod === 'GET') {
-        const dni = queryStringParameters?.dni;
-
-        if (!dni) {
+        const c_document = queryStringParameters?.c_document;
+        
+        // Validación de que el DNI fue proporcionado en la solicitud
+        if (!c_document) {
             return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: 'DNI es requerido' }),
             };
         }
 
         try {
-            // Consulta SQL segura usando parámetros
+            
+            // Consulta SQL para obtener los datos del empleado en base al DNI proporcionado
             const query = `
                 SELECT 
-                    dni, 
-                    nombres, 
-                    apellido_paterno, 
-                    apellido_materno, 
-                    distrito, 
-                    ciudad, 
-                    direccion, 
-                    genero, 
-                    sede, 
-                    contrato, 
-                    rol
+                    c_document, c_names, father_last_name, mother_last_name, city, district, address, gender_id, rol_id, location_id, contract_url
                 FROM ${table_name} 
-                WHERE dni = $1
+                WHERE c_document = $1
             `;
-            const values = [dni];
+            const values = [c_document];
 
             // Ejecución de la consulta
             const res = await pool.query(query, values);
@@ -54,25 +53,48 @@ export const handler = async (event) => {
             if (res.rows.length === 0) {
                 return {
                     statusCode: 404,
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                        'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                    },
                     body: JSON.stringify({ message: 'Empleado no encontrado' }),
                 };
             }
-
+            
+            // Respuesta de éxito con los datos del empleado
             return {
                 statusCode: 200,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify(res.rows[0]),
             };
 
         } catch (err) {
+            // Manejo de errores en la consulta a la base de datos
             console.error('Error al consultar la base de datos:', err);
             return {
                 statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ error: 'Error al consultar la base de datos', details: err }),
             };
         }
-    } else {
+    } else {        
+        // Respuesta para métodos HTTP no permitidos
         return {
             statusCode: 405,
+            headers: {
+                'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+            },
             body: JSON.stringify({ message: 'Método no permitido' }),
         };
     }
