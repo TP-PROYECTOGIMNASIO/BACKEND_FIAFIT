@@ -74,7 +74,6 @@ export const handler = async (event) => {
             };
 
         } catch (err) {
-            
             // Manejo de errores en la consulta a la base de datos
             console.error('Error al consultar la base de datos:', err);
             return {
@@ -87,8 +86,7 @@ export const handler = async (event) => {
                 body: JSON.stringify({ error: 'Error al consultar la base de datos', details: err }),
             };
         }
-    } else {
-        
+    } else {        
         // Respuesta para métodos HTTP no permitidos
         return {
             statusCode: 405,
