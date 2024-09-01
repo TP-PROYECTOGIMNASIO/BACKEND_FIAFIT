@@ -74,24 +74,44 @@ export const handler = async (event) => {
                 };
 
             case 'addProductToReport':
-                // Añadir un producto al informe de ventas existente
-                if (!reportId || !image || !name || !purchaseDate || !totalPrice || !product_type_id || !description || !quantity || !purchaseReceipt) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'Todos los campos son obligatorios' }),
-                    };
-                }
-                await client.query(
-                    `INSERT INTO t_sales_report_products 
-                    (report_id, image, name, purchase_date, total_price, product_type_id, description, quantity, purchase_receipt) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-                    [reportId, image, name, purchaseDate, totalPrice, product_type_id, description, quantity, purchaseReceipt]
-                );
+    // Verificar si faltan campos esenciales
+    if (!image || !name || !purchaseDate || !totalPrice || !product_type_id || !description || !quantity || !purchaseReceipt) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'Todos los campos son obligatorios' }),
+        };
+    }
+    
+    // Obtener el report_id de un informe no finalizado
+    const activeReportResult = await client.query(
+        'SELECT report_id FROM t_sales_reports WHERE is_finalized = false ORDER BY report_id DESC LIMIT 1'
+    );
 
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({ message: 'Producto añadido al informe' }),
-                };
+    if (activeReportResult.rows.length === 0) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'No hay un informe activo. Por favor, crea un nuevo informe de ventas.' }),
+        };
+    }
+
+    const reportId = activeReportResult.rows[0].report_id;
+
+    // Añadir el producto al informe de ventas activo
+    const productResult = await client.query(
+        `INSERT INTO t_sales_report_products 
+        (report_id, image, name, purchase_date, total_price, product_type_id, description, quantity, purchase_receipt) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+        RETURNING report_product_id`,
+        [reportId, image, name, purchaseDate, totalPrice, product_type_id, description, quantity, purchaseReceipt]
+    );
+
+    const newReportProductId = productResult.rows[0].report_product_id;
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ message: 'Producto añadido al informe', report_product_id: newReportProductId }),
+    };
+
 
             case 'updateProductInReport':
                 // Actualizar un producto en el informe de ventas usando report_product_id
