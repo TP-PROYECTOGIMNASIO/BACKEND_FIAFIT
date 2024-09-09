@@ -9,16 +9,19 @@ export const handler = async (event) => {
 
     try {
         let response;
-
-        if (httpMethod === 'POST') {
-            response = await createUser(event);
-        } else if (httpMethod === 'PUT') {
+        
+        if (httpMethod === 'PUT') {
             response = await confirmEmail(event);
-        } else if (httpMethod === 'GET') {
+        } else if (httpMethod === 'POST') {
             response = await login(event);
         } else {
             response = {
                 statusCode: 405,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: 'Método no permitido' }),
             };
         }
@@ -27,43 +30,55 @@ export const handler = async (event) => {
     } catch (error) {
         return {
             statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
             body: JSON.stringify({ message: 'Error interno del servidor', error: error.message }),
         };
     }
 };
 
-async function createUser(event) {
+async function createUser(username, mail, password) {
     try {
-        // Extraer datos del cuerpo del evento
-        const { username, email, password } = JSON.parse(event.body);
-
         // Parámetros para la creación del usuario
         const params = {
-            ClientId: '3vtti4k65ef7qi9inqqa5911f7', // App Client ID
+            ClientId: '7ekmlnhikbq4alfs8859rs4cp4', // Reemplaza con tu App Client ID
             Username: username,
             Password: password,
             UserAttributes: [
                 {
                     Name: 'email',
-                    Value: email,
+                    Value: mail,
                 },
                 {
-                    Name: 'nickname', // atributo nickname
+                    Name: 'nickname', // Agregar el atributo obligatorio "nickName"
                     Value: username,
                 }
             ]
         };
 
         // Registrar el usuario en el User Pool
-        const result = await cognito.signUp(params).promise();
+        // const result = await cognito.signUp(params).promise();
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: 'Usuario registrado con éxito. Se ha enviado un correo de verificación.', result }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
+            body: JSON.stringify({ message: 'Usuario registrado con éxito. Se ha enviado un correo de verificación.' }),
         };
     } catch (error) {
         return {
             statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
             body: JSON.stringify({ message: 'Error al registrar el usuario', error: error.message }),
         };
     }
@@ -76,7 +91,7 @@ async function confirmEmail(event) {
 
         // Parámetros para confirmar el registro del usuario
         const params = {
-            ClientId: '3vtti4k65ef7qi9inqqa5911f7', // Reemplaza con tu App Client ID
+            ClientId: '7ekmlnhikbq4alfs8859rs4cp4', // Reemplaza con tu App Client ID
             Username: username,
             ConfirmationCode: confirmationCode,
         };
@@ -86,24 +101,34 @@ async function confirmEmail(event) {
 
         return {
             statusCode: 200,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
             body: JSON.stringify({ message: 'Correo verificado con éxito.' }),
         };
     } catch (error) {
         return {
             statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
             body: JSON.stringify({ message: 'Error al verificar el correo', error: error.message }),
         };
     }
 }
 
 async function login(event) {
-    // logica de inicio de sesión
+    // Aquí puedes implementar la lógica de inicio de sesión
     try {
         const { username, password } = JSON.parse(event.body);
 
         const params = {
             AuthFlow: 'USER_PASSWORD_AUTH',
-            ClientId: '3vtti4k65ef7qi9inqqa5911f7', // App Client ID
+            ClientId: '7ekmlnhikbq4alfs8859rs4cp4', // Reemplaza con tu App Client ID
             AuthParameters: {
                 USERNAME: username,
                 PASSWORD: password,
@@ -114,6 +139,11 @@ async function login(event) {
 
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+            },
             body: JSON.stringify({
                 message: 'Login exitoso.',
                 idToken: result.AuthenticationResult.IdToken,
@@ -124,6 +154,11 @@ async function login(event) {
     } catch (error) {
         return {
             statusCode: 400,
+            headers: {
+                    'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                    'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
+                },
             body: JSON.stringify({ message: 'Error al iniciar sesión', error: error.message }),
         };
     }
