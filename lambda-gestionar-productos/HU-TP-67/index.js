@@ -54,7 +54,7 @@ export const handler = async (event, context) => {
               };
             }
             // Buscar producto por ID
-            const sql = "SELECT * FROM t_products WHERE id_product = $1";
+            const sql = "SELECT * FROM t_products WHERE product_id = $1";
             const result = await query(sql, [id_producto]);
 
             // Si devuelve 0 filas acabar y mostrar un mensaje
@@ -96,7 +96,7 @@ export const handler = async (event, context) => {
               };
             }
             // Buscar productos con location_id nulo y nombre que coincida con la búsqueda
-            const sql = "SELECT * FROM t_products WHERE location_id IS NULL AND name_product ILIKE $1";
+            const sql = "SELECT * FROM t_products WHERE location_id IS NULL AND name ILIKE $1";
             const result = await query(sql, [`%${search}%`]);
 
             // Si devuelve 0 filas acabar y mostrar un mensaje
@@ -126,7 +126,7 @@ export const handler = async (event, context) => {
           // Si no se especifica ID, devolver las diferente busquedas
           if (path.endsWith('/locations')) {
             // Me trae todas las sedes de la tabla t_locations
-            const sql = "SELECT location_id, c_name FROM t_locations";
+            const sql = "SELECT location_id, name FROM t_locations";
             const results = await query(sql);
             return {
               statusCode: 200,
@@ -152,7 +152,7 @@ export const handler = async (event, context) => {
             };
           } else if (path.endsWith('/typeproduct')) {
             // Me retorna todos los tipos de productos que tenemos
-            const sql = "SELECT * FROM t_type_product where state = 1";
+            const sql = "SELECT * FROM t_product_types";
             const results = await query(sql);
             return {
               statusCode: 200,
@@ -213,7 +213,7 @@ export const handler = async (event, context) => {
             }
 
             // Actualizar la sede del producto
-            const sql = "UPDATE t_products SET location_id = $1, created_at = NOW() AT TIME ZONE 'America/Lima' WHERE id_product = $2 RETURNING *";
+            const sql = "UPDATE t_products SET location_id = $1, created_at = NOW() AT TIME ZONE 'America/Lima' WHERE product_id = $2 RETURNING *";
             const result = await query(sql, [nueva_sede, id_product]);
 
             // Si devuelve 0 filas acabar y mostrar un mensaje
