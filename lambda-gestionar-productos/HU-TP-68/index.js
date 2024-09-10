@@ -58,7 +58,7 @@ export const handler = async (event, context) => {
             
             
             // Buscar producto por ID
-            const sql = "SELECT P.id_product, P.created_at, t.description, l.c_name as sede, p.stock, p.price FROM t_products AS P INNER JOIN t_type_product AS t on t.id_type_product = p.type_product INNER JOIN t_locations AS l on l.location_id = p.location_id WHERE p.location_id IS NOT NULL AND p.id_product = $1";
+            const sql = "SELECT P.product_id, P.created_at, t.name, l.name as sede, p.stock_quantity, p.price FROM t_products AS P INNER JOIN t_product_types AS t on t.product_type_id = p.product_type_id INNER JOIN t_locations AS l on l.location_id = p.location_id WHERE p.location_id IS NOT NULL AND p.product_id = $1";
             const result = await query(sql, [id_producto]);
 
 
@@ -91,7 +91,7 @@ export const handler = async (event, context) => {
           // Si no se especifica ID, devolver las diferente busquedas
           if (path.endsWith('/viewdetails')) {
             // Me trae todas las sedes de la tabla t_locations
-            const sql = "SELECT id_product,name_product,price, created_at FROM t_products WHERE location_id IS NOT NULL";
+            const sql = "SELECT product_id,name,price, created_at FROM t_products WHERE location_id IS NOT NULL";
             const results = await query(sql);
             return {
               statusCode: 200,
