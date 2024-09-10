@@ -17,6 +17,11 @@ export const handler = async (event) => {
         } else {
             response = {
                 statusCode: 405,
+                headers: {
+                        'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                        'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                        'Access-Control-Allow-Methods': 'OPTIONS,PATCH,PUT' // Permitir ciertos métodos HTTP
+                },
                 body: JSON.stringify({ message: 'Método no permitido' }),
             };
         }
@@ -25,6 +30,11 @@ export const handler = async (event) => {
     } catch (error) {
         return {
             statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                'Access-Control-Allow-Methods': 'OPTIONS,PATCH,PUT' // Permitir ciertos métodos HTTP
+            },
             body: JSON.stringify({ message: 'Error interno del servidor', error: error.message }),
         };
     }
@@ -44,11 +54,21 @@ async function initiatePasswordReset(event) {
 
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                'Access-Control-Allow-Methods': 'OPTIONS,PATCH,PUT' // Permitir ciertos métodos HTTP
+            },
             body: JSON.stringify({ message: 'Código de verificación enviado para restablecer la contraseña.' }),
         };
     } catch (error) {
         return {
             statusCode: 400,
+            headers: {
+                'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                'Access-Control-Allow-Methods': 'OPTIONS,PATCH,PUT' // Permitir ciertos métodos HTTP
+            },
             body: JSON.stringify({ message: 'Error al iniciar el proceso de recuperación de contraseña', error: error.message }),
         };
     }
@@ -70,12 +90,22 @@ async function confirmPasswordReset(event) {
 
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                'Access-Control-Allow-Methods': 'OPTIONS,PATCH,PUT' // Permitir ciertos métodos HTTP
+            },
             body: JSON.stringify({ message: 'Contraseña restablecida con éxito.' }),
         };
     } catch (error) {
         return {
             statusCode: 400,
+            headers: {
+                'Access-Control-Allow-Origin': '*',  // Permitir solicitudes desde cualquier origen
+                'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
+                'Access-Control-Allow-Methods': 'OPTIONS,PATCH,PUT' // Permitir ciertos métodos HTTP
+            },
             body: JSON.stringify({ message: 'Error al restablecer la contraseña', error: error.message }),
-        };
-    }
+ };
+}
 }
