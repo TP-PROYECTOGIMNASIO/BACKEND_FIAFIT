@@ -28,12 +28,20 @@ jobs:
     # Copy files from BACKEND_FIAFIT to TEMPORAL_CHANGE (excluding the TEMPORAL_CHANGE directory)
     - name: Copy files
       run: |
-        find . -mindepth 1 -maxdepth 1 ! -name 'TEMPORAL_CHANGE' -exec cp -R {} ./TEMPORAL_CHANGE/ \;
+        find . -mindepth 1 -maxdepth 1 ! -name 'TEMPORAL_CHANGE' -exec cp -Rf {} ./TEMPORAL_CHANGE/ \;
+
+    # Verify if there are changes
+    - name: Check for changes
+      run: |
+        cd TEMPORAL_CHANGE
+        git status
+        git diff --exit-code || echo "Changes detected"
 
     # Commit and push changes to the 'BACK' branch of MAIN_PROYFIAFIT
     - name: Commit and push changes
+      if: success()
       run: |
         cd TEMPORAL_CHANGE
         git add .
-        git commit -m "Sync from BACKEND_FIAFIT"
+        git commit -m "Sync from BACKEND_FIAFIT" || echo "Nothing to commit"
         git push origin BACK
