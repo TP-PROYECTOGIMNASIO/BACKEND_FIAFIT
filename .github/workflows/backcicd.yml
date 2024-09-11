@@ -30,8 +30,12 @@ jobs:
       run: |
         cd TEMPORAL_CHANGE
         git add .
-        git commit -m "Sync from BACKEND_FIAFIT"
-        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git BACK
+        if git diff-index --quiet HEAD --; then
+          echo "No changes to commit"
+        else
+          git commit -m "Sync from BACKEND_FIAFIT"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git BACK
+        fi
     #    git status
     #   git diff --exit-code || echo "Changes detected"
 
