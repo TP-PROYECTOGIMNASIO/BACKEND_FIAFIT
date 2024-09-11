@@ -3,7 +3,7 @@ name: Push changes to MAIN_PROYFIAFIT
 on:
   push:
     branches:
-      - main  # Este flujo se activa cuando hay un push en la rama 'main' de RepoC
+      - main  # Este flujo se activa cuando hay un push en la rama 'main' de BACKEND_FIAFIT
 
 jobs:
   push_to_dev:
