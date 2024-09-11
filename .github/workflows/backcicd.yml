@@ -28,9 +28,7 @@ jobs:
       # Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
     - name: Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
       run: |
-        echo "Antes del rsync-------------------------------------------------------------------"
         rsync -av --exclude='TEMPORAL_CHANGE' ./ TEMPORAL_CHANGE/
-        echo "Despues del rsync-------------------------------------------------------------------"
         cd TEMPORAL_CHANGE
-        ls
+        git branch -a
 
