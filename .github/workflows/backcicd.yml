@@ -38,7 +38,7 @@ jobs:
     # Copy files from BACKEND_FIAFIT to the cloned MAIN_PROYFIAFIT
     - name: Copy files to MAIN_PROYFIAFIT
       run: |
-        cp -r * $dir/
+        cp -r . $dir/  # Ensure relative copy of the current directory's contents
 
     # Commit and push changes to the 'BACK' branch in MAIN_PROYFIAFIT
     - name: Commit and push changes
