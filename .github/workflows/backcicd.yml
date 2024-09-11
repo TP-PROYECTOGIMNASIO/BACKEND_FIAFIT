@@ -1,37 +1,45 @@
-name: Push changes to MAIN_PROYFIAFIT
+name: Push to MAIN_FIAFIT
 
 on:
   push:
     branches:
-      - main  # Este flujo se activa cuando hay un push en la rama 'main' de BACKEND_FIAFIT
+      - main
 
 jobs:
-  push_to_dev:
+  push_to_other_repo:
     runs-on: ubuntu-latest
 
     steps:
-    # Paso 1: Checkout del código de la rama 'main' de RepoC
-    - name: Checkout BACKEND_FIAFIT main branch
+    # Checkout the current repository (BACK_FIAFIT)
+    - name: Checkout BACK_FIAFIT
       uses: actions/checkout@v2
-      with:
-        ref: main
 
-    # Paso 2: Configurar Git para los commits automáticos
+    # Configure Git with credentials
     - name: Set up Git
       run: |
-        git config --global user.name "gonzalo1998peru"
-        git config --global user.email "gonzalo_huertas_oliva@outlook.es"
+        git config --global user.name 'Your Name'
+        git config --global user.email 'your-email@example.com'
 
-    # Paso 3: Crear un directorio temporal único para clonar el repositorio RepoD
-    - name: Create unique target directory and clone MAIN_PROYFIAFIT
-      env:
-        TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
+    # Clone the target repository MAIN_FIAFIT
+    - name: Clone MAIN_FIAFIT repository
       run: |
-        dir=$(mktemp -d)
-        git clone --branch main https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
-        rsync -av --exclude='.git' ./ $dir/
-        cd $dir
+        git clone https://<YOUR_GITHUB_TOKEN>@github.com/YOUR_USERNAME/MAIN_FIAFIT.git
+        cd MAIN_FIAFIT
+        git checkout -b back || git checkout back
+
+    # Copy files from BACK_FIAFIT to MAIN_FIAFIT
+    - name: Copy files to MAIN_FIAFIT
+      run: |
+        cp -r ./* ../MAIN_FIAFIT/
+
+    # Commit and push changes to MAIN_FIAFIT
+    - name: Commit and push changes
+      run: |
+        cd MAIN_FIAFIT
         git add .
-        git commit -m "Auto-sync from BACKEND_FIAFIT/main"
-        git push origin/BACK
-        
+        git commit -m "Update from BACK_FIAFIT"
+        git push origin back
+
+    # Clean up the cloned repository
+    - name: Clean up
+      run: rm -rf MAIN_FIAFIT/
