@@ -20,13 +20,13 @@ jobs:
         git config --global user.name 'gonzalo1998peru'
         git config --global user.email 'gonzalo_huertas_oliva@outlook.es'
 
-    # Clone the target repository MAIN_PROYFIAFIT (to branch 'back')
+    # Clone the target repository MAIN_PROYFIAFIT (to branch 'BACK')
     - name: Clone MAIN_PROYFIAFIT
       env:
         TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
       run: |
         dir=$(mktemp -d) # Create temporary directory
-        git clone --branch back https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
+        git clone --branch BACK https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
         echo $dir # Print directory for debugging
         ls -al $dir
 
@@ -35,13 +35,13 @@ jobs:
       run: |
         cp -r ./* $dir/
 
-    # Commit and push changes to the 'back' branch in MAIN_PROYFIAFIT
+    # Commit and push changes to the 'BACK' branch in MAIN_PROYFIAFIT
     - name: Commit and push changes
       run: |
         cd $dir
         git add .
         git commit -m "Update from BACKEND_FIAFIT"
-        git push origin back
+        git push origin BACK
 
     # Clean up the cloned repository
     - name: Clean up
