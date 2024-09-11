@@ -23,27 +23,22 @@ jobs:
     # Clone the MAIN_FIAFIT repository (branch 'BACK') into TEMPORAL_CHANGE directory
     - name: Clone MAIN_PROYFIAFIT
       run: |
-        git clone --branch main https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/BACKEND_FIAFIT.git TEMPORAL_CHANGE
+        git clone --branch main https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
 
-    # Verify if there are changes
-    - name: Check for changes
+    # Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
+    - name: Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
       run: |
+        cp -R ./* TEMPORAL_CHANGE/
         cd TEMPORAL_CHANGE
         git add .
+        
+    # Check for changes before committing
+    - name: Commit and push changes
+      run: |
+        cd TEMPORAL_CHANGE
         if git diff-index --quiet HEAD --; then
           echo "No changes to commit"
         else
           git commit -m "Sync from BACKEND_FIAFIT"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git BACK
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git main
         fi
-    #    git status
-    #   git diff --exit-code || echo "Changes detected"
-
-    # Commit and push changes to the 'BACK' branch of MAIN_PROYFIAFIT
-    #- name: Commit and push changes
-    #  if: success()
-    #  run: |
-    #    cd TEMPORAL_CHANGE
-    #    git add .
-    #    git commit -m "Sync from BACKEND_FIAFIT" || echo "Nothing to commit"
-    #    git push origin BACK
