@@ -28,7 +28,7 @@ jobs:
         TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
       run: |
         dir=$(mktemp -d)
-        git clone --branch main https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/gonzalo1998peru/MAIN_PROYFIAFIT.git $dir
+        git clone --branch main https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
         rsync -av --exclude='.git' ./ $dir/
         cd $dir
         git add .
