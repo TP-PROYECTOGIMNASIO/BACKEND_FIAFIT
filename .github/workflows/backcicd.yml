@@ -40,7 +40,7 @@ jobs:
         git status
         git add .
         git status
-        git commit -m "porfavor dios5"
+        git commit -m "Sync from BACKEND_FIAFIT"
         git push
         
 
