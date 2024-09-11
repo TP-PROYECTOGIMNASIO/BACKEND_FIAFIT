@@ -25,4 +25,7 @@ jobs:
       run: |
         git clone --branch BACK https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
         ls
+        echo "TEMPORAL_CHANGE"
+        cd TEMPORAL_CHANGE
+        ls
 
