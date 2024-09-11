@@ -29,7 +29,9 @@ jobs:
     - name: Check for changes
       run: |
         cd TEMPORAL_CHANGE
-        git branch -a
+        git add .
+        git commit -m "Sync from BACKEND_FIAFIT"
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git BACK
     #    git status
     #   git diff --exit-code || echo "Changes detected"
 
