@@ -24,8 +24,10 @@ jobs:
     - name: Clone MAIN_PROYFIAFIT
       run: |
         git clone --branch BACK https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
-        ls
-        echo "TEMPORAL_CHANGE"
+
+      # Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
+    - name: Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
+      run: |
+        rsync -av --exclude='TEMPORAL_CHANGE' ./ TEMPORAL_CHANGE/
         cd TEMPORAL_CHANGE
-        ls
 
