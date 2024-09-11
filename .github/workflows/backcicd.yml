@@ -21,11 +21,13 @@ jobs:
         git config --global user.email 'gonzalo_huertas_oliva@outlook.es'
 
     # Clone the target repository MAIN_FIAFIT
-    - name: Clone MAIN_FIAFIT repository
+     name: Create unique target directory and clone MAIN_PROYFIAFIT
+      env:
+        TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
       run: |
-        git clone https://<YOUR_GITHUB_TOKEN>@github.com/TP-PROYECTOGIMNASIO/MAIN_FIAFIT.git
-        cd MAIN_FIAFIT
-        git checkout -b back || git checkout back
+        dir=$(mktemp -d)
+        git clone --branch main https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
+
 
     # Copy files from BACK_FIAFIT to MAIN_FIAFIT
     - name: Copy files to MAIN_FIAFIT
