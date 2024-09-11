@@ -30,5 +30,7 @@ jobs:
       run: |
         rsync -av --exclude='TEMPORAL_CHANGE' ./ TEMPORAL_CHANGE/
         cd TEMPORAL_CHANGE
-        git branch -a
+        git add .
+        git commit -m "Sync from BACKEND_FIAFIT"
+        git push origin HEAD:BACK
 
