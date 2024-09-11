@@ -36,7 +36,7 @@ jobs:
     # Paso 4: Sincronizar los cambios de BACKEND_FIAFIT main a MAIN_PROYFIAFIT BACK
     - name: Sync changes to MAIN_PROYFIAFIT BACK branch
       run: |
-        rsync -av --exclude='.git' --no-perms --exclude='/.github' --exclude='/lambda-gestionar-*' $GITHUB_WORKSPACE/ $dir/
+        rsync -av --exclude='.git' --no-perms --exclude='/.github' --exclude='/lambda-gestionar-*' $GITHUB_WORKSPACE/* $dir/  # Corrige la ruta de rsync para evitar escribir en el root
         cd $dir
         git add .
         git commit -m "Auto-sync from BACKEND_FIAFIT/main"
