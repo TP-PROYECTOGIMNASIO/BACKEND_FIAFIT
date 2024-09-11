@@ -30,7 +30,5 @@ jobs:
       run: |
         rsync -av --exclude='TEMPORAL_CHANGE' ./ TEMPORAL_CHANGE/
         cd TEMPORAL_CHANGE
-        git checkout BACK
-        echo "Despues del checkout-------------------------------------------------------------------"
-        ls
+        git brach -a
 
