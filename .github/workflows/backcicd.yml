@@ -29,7 +29,7 @@ jobs:
     - name: Check for changes
       run: |
         cd TEMPORAL_CHANGE
-        git checkout
+        git branch -a
     #    git status
     #   git diff --exit-code || echo "Changes detected"
 
