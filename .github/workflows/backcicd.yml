@@ -29,10 +29,6 @@ jobs:
     - name: Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
       run: |
         cd TEMPORAL_CHANGE
-        git checkout BACK
-        echo "1er ls-------------------------------------------------------------------"
-        ls
-        rsync -av --exclude='TEMPORAL_CHANGE' ./ TEMPORAL_CHANGE/
-        echo "2do ls-------------------------------------------------------------------"
-        ls
+        git branch -a
+        
 
