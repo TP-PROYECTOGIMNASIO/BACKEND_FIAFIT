@@ -32,7 +32,7 @@ jobs:
         git branch -a
         cd ..
 
-        rsync -av --exclude='TEMPORAL_CHANGE' ./ TEMPORAL_CHANGE/
+        rsync -av --exclude='.git' --exclude='TEMPORAL_CHANGE' ./ TEMPORAL_CHANGE/
         cd TEMPORAL_CHANGE
         git branch -a
         ls
