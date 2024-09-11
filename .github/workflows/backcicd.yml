@@ -33,4 +33,5 @@ jobs:
         cd $dir
         git add .
         git commit -m "Auto-sync from BACKEND_FIAFIT/main"
-        git branch -a
+        git push remotes/origin/BACK
+        
