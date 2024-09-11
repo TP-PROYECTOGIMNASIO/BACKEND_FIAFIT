@@ -25,10 +25,10 @@ jobs:
       run: |
         git clone --branch BACK https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
 
-    # Copy files from BACKEND_FIAFIT to TEMPORAL_CHANGE (without unnecessary complexity)
+    # Copy files from BACKEND_FIAFIT to TEMPORAL_CHANGE (excluding the TEMPORAL_CHANGE directory)
     - name: Copy files
       run: |
-        cp -R * ./TEMPORAL_CHANGE/
+        find . -mindepth 1 -maxdepth 1 ! -name 'TEMPORAL_CHANGE' -exec cp -R {} ./TEMPORAL_CHANGE/ \;
 
     # Commit and push changes to the 'BACK' branch of MAIN_PROYFIAFIT
     - name: Commit and push changes
