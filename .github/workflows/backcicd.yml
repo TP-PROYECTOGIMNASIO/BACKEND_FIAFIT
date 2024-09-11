@@ -22,7 +22,7 @@ jobs:
 
     # Clone the target repository MAIN_FIAFIT
      name: Create unique target directory and clone MAIN_PROYFIAFIT
-      env:
+     env:
         TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
       run: |
         dir=$(mktemp -d)
