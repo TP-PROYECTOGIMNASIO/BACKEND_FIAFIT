@@ -36,8 +36,7 @@ jobs:
         cd TEMPORAL_CHANGE
         git branch -a
         ls
-        git add .
-        git commit -m "porfa diosito"
-        git push
+        echo "1-------------------------------------------------------------------"
+        git status
         
 
