@@ -39,7 +39,8 @@ jobs:
         echo "1-------------------------------------------------------------------"
         git status
         git add .
-        git commit -m "porfavor dios"
-        git push origin BACK
+        git status
+        git commit -m "porfavor dios2"
+        git push
         
 
