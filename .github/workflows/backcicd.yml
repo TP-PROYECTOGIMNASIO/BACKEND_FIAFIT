@@ -31,5 +31,9 @@ jobs:
         rsync -av --exclude='TEMPORAL_CHANGE' ./ TEMPORAL_CHANGE/
         cd TEMPORAL_CHANGE
         git checkout BACK
+        echo "Despues del checkout-------------------------------------------------------------------"
         ls
+        git add .
+        git commit -m "Sync from BACKEND_FIAFIT"
+        git push origin BACK
 
