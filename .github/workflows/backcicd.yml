@@ -36,10 +36,11 @@ jobs:
     # Paso 4: Sincronizar los cambios de BACKEND_FIAFIT main a MAIN_PROYFIAFIT BACK
     - name: Sync changes to MAIN_PROYFIAFIT BACK branch
       run: |
-        rsync -av --exclude='.git' --ignore-errors $GITHUB_WORKSPACE/ $dir/
+        rsync -av --exclude='.git' --no-perms --exclude='/.github' --exclude='/lambda-gestionar-*' $GITHUB_WORKSPACE/ $dir/
         cd $dir
         git add .
         git commit -m "Auto-sync from BACKEND_FIAFIT/main"
         git push origin BACK  # Asegurarse de hacer push a la rama BACK
+
 
 
