@@ -24,6 +24,5 @@ jobs:
     - name: Clone MAIN_PROYFIAFIT
       run: |
         git clone --branch BACK https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
-        git clone --branch main https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/BACKEND_FIAFIT.git NEW_FILES
         ls
 
