@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  push_to_other_repo:
+  push_to_dev:
     runs-on: ubuntu-latest
 
     steps:
