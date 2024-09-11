@@ -1,54 +1,44 @@
-name: Push to MAIN_FIAFIT
+name: Push changes to MAIN_PROYFIAFIT
 
 on:
   push:
     branches:
-      - main
+      - main  # Este flujo se activa cuando hay un push en la rama 'main' de BACKEND_FIAFIT
 
 jobs:
-  push_to_dev:
+  push_to_back:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the current repository (BACKEND_FIAFIT)
-    - name: Checkout BACKEND_FIAFIT
+    # Paso 1: Checkout del código de la rama 'main' de BACKEND_FIAFIT
+    - name: Checkout BACKEND_FIAFIT main branch
       uses: actions/checkout@v2
+      with:
+        ref: main
 
-    # Configure Git with credentials
+    # Paso 2: Configurar Git para los commits automáticos
     - name: Set up Git
       run: |
-        git config --global user.name 'gonzalo1998peru'
-        git config --global user.email 'gonzalo_huertas_oliva@outlook.es'
+        git config --global user.name "gonzalo1998peru"
+        git config --global user.email "gonzalo_huertas_oliva@outlook.es"
 
-    # Clone the target repository MAIN_PROYFIAFIT (to branch 'BACK')
-    - name: Clone MAIN_PROYFIAFIT
+    # Paso 3: Crear un directorio temporal único para clonar el repositorio MAIN_PROYFIAFIT en la rama BACK
+    - name: Create unique target directory and clone MAIN_PROYFIAFIT (BACK branch)
       env:
         TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
       run: |
-        dir=$(mktemp -d) # Create temporary directory
-        git clone --branch BACK https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
-        echo $dir # Print directory for debugging
-        ls -al $dir # Check that the directory is correctly populated with .git
-
-    # Verify directory permissions
-    - name: Verify directory permissions
-      run: |
-        ls -ld $dir
-
-    # Copy files from BACKEND_FIAFIT to the cloned MAIN_PROYFIAFIT excluding .git and .github
-    - name: Copy files to MAIN_PROYFIAFIT
-      run: |
-        rsync -a --exclude='.git' --exclude='.github' ./ $dir/ --no-perms --no-owner --no-group --omit-dir-times
-
-    # Commit and push changes to the 'BACK' branch in MAIN_PROYFIAFIT
-    - name: Commit and push changes
-      run: |
+        dir=$(mktemp -d)
+        # Hacemos un fetch para asegurarnos de que tenemos la rama BACK disponible
+        git clone https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
         cd $dir
-        git status # Check if in a Git repository
-        git add .
-        git commit -m "Update from BACKEND_FIAFIT"
-        git push origin BACK
+        git fetch origin BACK  # Traemos todas las ramas, incluyendo BACK
+        git checkout BACK      # Cambiamos a la rama BACK
 
-    # Clean up the cloned repository
-    - name: Clean up
-      run: rm -rf $dir
+    # Paso 4: Sincronizar los cambios de BACKEND_FIAFIT main a MAIN_PROYFIAFIT BACK
+    - name: Sync changes to MAIN_PROYFIAFIT BACK branch
+      run: |
+        rsync -av --exclude='.git' ./ $dir/
+        cd $dir
+        git add .
+        git commit -m "Auto-sync from BACKEND_FIAFIT/main"
+        git push origin BACK  # Asegurarse de hacer push a la rama BACK
