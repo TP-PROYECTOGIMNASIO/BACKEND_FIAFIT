@@ -1,4 +1,4 @@
-name: Push changes to MAIN_PROYFIAFIT
+name: Push changes to MAIN_PROYFIAFIT (BACK branch)
 
 on:
   push:
@@ -28,7 +28,6 @@ jobs:
         TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
       run: |
         dir=$(mktemp -d)
-        # Hacemos un fetch para asegurarnos de que tenemos la rama BACK disponible
         git clone https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
         cd $dir
         git fetch origin BACK  # Traemos todas las ramas, incluyendo BACK
@@ -37,8 +36,9 @@ jobs:
     # Paso 4: Sincronizar los cambios de BACKEND_FIAFIT main a MAIN_PROYFIAFIT BACK
     - name: Sync changes to MAIN_PROYFIAFIT BACK branch
       run: |
-        rsync -av --exclude='.git' ./ $dir/
+        rsync -av --exclude='.git' ./ $GITHUB_WORKSPACE/ $dir/
         cd $dir
         git add .
         git commit -m "Auto-sync from BACKEND_FIAFIT/main"
         git push origin BACK  # Asegurarse de hacer push a la rama BACK
+
