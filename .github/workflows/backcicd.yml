@@ -27,7 +27,7 @@ jobs:
       run: |
         dir=$(mktemp -d) # Create temporary directory
         git clone --branch BACK https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
-        echo $dir # Print directory for debugging
+        echo "Cloned into: $dir"
         ls -al $dir
 
     # Verify directory permissions
@@ -38,7 +38,7 @@ jobs:
     # Copy files from BACKEND_FIAFIT to the cloned MAIN_PROYFIAFIT excluding .git and .github
     - name: Copy files to MAIN_PROYFIAFIT
       run: |
-        rsync -av --exclude='.git' --exclude='.github' ./ $dir/  # Use rsync to copy with exclusions
+        rsync -av --exclude='.git' --exclude='.github' ./ $dir  # Copia archivos al directorio temporal
 
     # Commit and push changes to the 'BACK' branch in MAIN_PROYFIAFIT
     - name: Commit and push changes
