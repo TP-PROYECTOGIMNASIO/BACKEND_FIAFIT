@@ -20,20 +20,20 @@ jobs:
         git config --global user.name 'gonzalo1998peru'
         git config --global user.email 'gonzalo_huertas_oliva@outlook.es'
 
-    # Clone the MAIN_FIAFIT repository (branch 'BACK')
+    # Clone the MAIN_FIAFIT repository (branch 'BACK') into TEMPORAL_CHANGE directory
     - name: Clone MAIN_PROYFIAFIT
       run: |
-        git clone --branch BACK https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git MAIN_PROYFIAFIT
+        git clone --branch BACK https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
 
-    # Copy files from BACKEND_FIAFIT to MAIN_FIAFIT (without unnecessary complexity)
+    # Copy files from BACKEND_FIAFIT to TEMPORAL_CHANGE (without unnecessary complexity)
     - name: Copy files
       run: |
-        cp -R * ./MAIN_PROYFIAFIT/
+        cp -R * ./TEMPORAL_CHANGE/
 
     # Commit and push changes to the 'BACK' branch of MAIN_PROYFIAFIT
     - name: Commit and push changes
       run: |
-        cd MAIN_PROYFIAFIT
+        cd TEMPORAL_CHANGE
         git add .
         git commit -m "Sync from BACKEND_FIAFIT"
         git push origin BACK
