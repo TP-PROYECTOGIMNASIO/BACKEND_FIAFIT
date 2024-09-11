@@ -21,8 +21,8 @@ jobs:
         git config --global user.email 'gonzalo_huertas_oliva@outlook.es'
 
     # Clone the target repository MAIN_FIAFIT
-     name: Create unique target directory and clone MAIN_PROYFIAFIT
-     env:
+    - name: Create unique target directory and clone MAIN_PROYFIAFIT
+      env:
         TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
       run: |
         dir=$(mktemp -d)
