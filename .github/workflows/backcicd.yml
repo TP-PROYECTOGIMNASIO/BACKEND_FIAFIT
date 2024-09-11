@@ -1,0 +1,36 @@
+name: Push changes to MAIN_PROYFIAFIT
+
+on:
+  push:
+    branches:
+      - main  # Este flujo se activa cuando hay un push en la rama 'main' de RepoC
+
+jobs:
+  push_to_dev:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Paso 1: Checkout del código de la rama 'main' de RepoC
+    - name: Checkout BACKEND_FIAFIT main branch
+      uses: actions/checkout@v2
+      with:
+        ref: main
+
+    # Paso 2: Configurar Git para los commits automáticos
+    - name: Set up Git
+      run: |
+        git config --global user.name "gonzalo1998peru"
+        git config --global user.email "gonzalo_huertas_oliva@outlook.es"
+
+    # Paso 3: Crear un directorio temporal único para clonar el repositorio RepoD
+    - name: Create unique target directory and clone MAIN_PROYFIAFIT
+      env:
+        TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
+      run: |
+        dir=$(mktemp -d)
+        git clone --branch main https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/gonzalo1998peru/MAIN_PROYFIAFIT.git $dir
+        rsync -av --exclude='.git' ./ $dir/
+        cd $dir
+        git add .
+        git commit -m "Auto-sync from BACKEND_FIAFIT/main"
+        git push origin main
