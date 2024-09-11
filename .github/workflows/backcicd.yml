@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the current repository (BACK_FIAFIT)
-    - name: Checkout BACK_FIAFIT
+    # Checkout the current repository (BACKEND_FIAFIT)
+    - name: Checkout BACKEND_FIAFIT
       uses: actions/checkout@v2
 
     # Configure Git with credentials
@@ -20,28 +20,29 @@ jobs:
         git config --global user.name 'gonzalo1998peru'
         git config --global user.email 'gonzalo_huertas_oliva@outlook.es'
 
-    # Clone the target repository MAIN_FIAFIT
-    - name: Create unique target directory and clone MAIN_PROYFIAFIT
+    # Clone the target repository MAIN_PROYFIAFIT (to branch 'back')
+    - name: Clone MAIN_PROYFIAFIT
       env:
         TOKEN_BACK: ${{ secrets.access_token_gonzalo }}  # Secreto configurado con el valor de 'token1'
       run: |
-        dir=$(mktemp -d)
-        git clone --branch main https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
+        dir=$(mktemp -d) # Create temporary directory
+        git clone --branch back https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git $dir
+        echo $dir # Print directory for debugging
+        ls -al $dir
 
-
-    # Copy files from BACK_FIAFIT to MAIN_FIAFIT
-    - name: Copy files to MAIN_FIAFIT
+    # Copy files from BACKEND_FIAFIT to the cloned MAIN_PROYFIAFIT
+    - name: Copy files to MAIN_PROYFIAFIT
       run: |
-        cp -r ./* ../MAIN_FIAFIT/
+        cp -r ./* $dir/
 
-    # Commit and push changes to MAIN_FIAFIT
+    # Commit and push changes to the 'back' branch in MAIN_PROYFIAFIT
     - name: Commit and push changes
       run: |
-        cd MAIN_FIAFIT
+        cd $dir
         git add .
-        git commit -m "Update from BACK_FIAFIT"
+        git commit -m "Update from BACKEND_FIAFIT"
         git push origin back
 
     # Clean up the cloned repository
     - name: Clean up
-      run: rm -rf MAIN_FIAFIT/
+      run: rm -rf $dir
