@@ -23,25 +23,21 @@ jobs:
     # Clone the MAIN_FIAFIT repository (branch 'BACK') into TEMPORAL_CHANGE directory
     - name: Clone MAIN_PROYFIAFIT
       run: |
-        git clone --branch BACK https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
-
-    # Copy files from BACKEND_FIAFIT to TEMPORAL_CHANGE (excluding the TEMPORAL_CHANGE directory)
-    - name: Copy files
-      run: |
-        find . -mindepth 1 -maxdepth 1 ! -name 'TEMPORAL_CHANGE' -exec cp -Rf {} ./TEMPORAL_CHANGE/ \;
+        git clone --branch main https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/BACKEND_FIAFIT.git TEMPORAL_CHANGE
 
     # Verify if there are changes
     - name: Check for changes
       run: |
         cd TEMPORAL_CHANGE
-        git status
-        git diff --exit-code || echo "Changes detected"
+        ls
+    #    git status
+    #   git diff --exit-code || echo "Changes detected"
 
     # Commit and push changes to the 'BACK' branch of MAIN_PROYFIAFIT
-    - name: Commit and push changes
-      if: success()
-      run: |
-        cd TEMPORAL_CHANGE
-        git add .
-        git commit -m "Sync from BACKEND_FIAFIT" || echo "Nothing to commit"
-        git push origin BACK
+    #- name: Commit and push changes
+    #  if: success()
+    #  run: |
+    #    cd TEMPORAL_CHANGE
+    #    git add .
+    #    git commit -m "Sync from BACKEND_FIAFIT" || echo "Nothing to commit"
+    #    git push origin BACK
