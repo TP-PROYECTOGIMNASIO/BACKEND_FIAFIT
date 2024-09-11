@@ -26,7 +26,7 @@ jobs:
     # Clone the MAIN_FIAFIT repository (branch 'BACK') into TEMPORAL_CHANGE directory
     - name: Clone MAIN_PROYFIAFIT
       run: |
-        git clone --branch BACK https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
+        git clone --branch BACK https://x-access-token:${{ secrets.access_token_gonzalo }}@github.com/TP-PROYECTOGIMNASIO/MAIN_PROYFIAFIT.git TEMPORAL_CHANGE
 
       # Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
     - name: Copy files from BACKEND_FIAFIT to MAIN_PROYFIAFIT
