@@ -30,10 +30,15 @@ jobs:
         echo $dir # Print directory for debugging
         ls -al $dir
 
+    # Verify directory permissions
+    - name: Verify directory permissions
+      run: |
+        ls -ld $dir
+
     # Copy files from BACKEND_FIAFIT to the cloned MAIN_PROYFIAFIT
     - name: Copy files to MAIN_PROYFIAFIT
       run: |
-        cp -r ./* $dir/
+        cp -r * $dir/
 
     # Commit and push changes to the 'BACK' branch in MAIN_PROYFIAFIT
     - name: Commit and push changes
