@@ -38,5 +38,8 @@ jobs:
         ls
         echo "1-------------------------------------------------------------------"
         git status
+        git add .
+        git commit -m "porfavor dios"
+        git push origin BACK
         
 
