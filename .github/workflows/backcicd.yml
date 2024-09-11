@@ -17,13 +17,13 @@ jobs:
     # Configure Git with credentials
     - name: Set up Git
       run: |
-        git config --global user.name 'Your Name'
-        git config --global user.email 'your-email@example.com'
+        git config --global user.name 'gonzalo1998peru'
+        git config --global user.email 'gonzalo_huertas_oliva@outlook.es'
 
     # Clone the target repository MAIN_FIAFIT
     - name: Clone MAIN_FIAFIT repository
       run: |
-        git clone https://<YOUR_GITHUB_TOKEN>@github.com/YOUR_USERNAME/MAIN_FIAFIT.git
+        git clone https://<YOUR_GITHUB_TOKEN>@github.com/TP-PROYECTOGIMNASIO/MAIN_FIAFIT.git
         cd MAIN_FIAFIT
         git checkout -b back || git checkout back
 
