@@ -38,7 +38,7 @@ jobs:
     # Copy files from BACKEND_FIAFIT to the cloned MAIN_PROYFIAFIT excluding .git and .github
     - name: Copy files to MAIN_PROYFIAFIT
       run: |
-        rsync -av --exclude='.git' --exclude='.github' ./ $dir/  --no-perms --no-owner --no-group
+        rsync -a --exclude='.git' --exclude='.github' ./ $dir/ --no-perms --no-owner --no-group --omit-dir-times
 
     # Commit and push changes to the 'BACK' branch in MAIN_PROYFIAFIT
     - name: Commit and push changes
