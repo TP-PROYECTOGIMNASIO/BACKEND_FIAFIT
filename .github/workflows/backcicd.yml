@@ -19,6 +19,9 @@ jobs:
       run: |
         git config --global user.name 'gonzalo1998peru'
         git config --global user.email 'gonzalo_huertas_oliva@outlook.es'
+    # Set up environment variables
+    - name: Set up environment variables
+      run: echo "SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}" >> $GITHUB_ENV    
 
     # Clone the MAIN_FIAFIT repository (branch 'BACK') into TEMPORAL_CHANGE directory
     - name: Clone MAIN_PROYFIAFIT
