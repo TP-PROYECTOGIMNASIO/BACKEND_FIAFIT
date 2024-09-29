@@ -34,4 +34,3 @@ jobs:
         git commit -m "Sync from BACKEND_FIAFIT"
         git push
         
-
