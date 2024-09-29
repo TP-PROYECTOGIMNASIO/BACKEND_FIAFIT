@@ -5,7 +5,7 @@ import sgMail from '@sendgrid/mail';
 
 const { Pool } = pkg;
 
-const API_KEY = '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';
+const sendGridApiKey = process.env.SENDGRID_API_KEY;
 sgMail.setApiKey(API_KEY);
 
 // Configura la conexión con PostgreSQL
