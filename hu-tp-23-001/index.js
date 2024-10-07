@@ -59,13 +59,8 @@ export const handler = async (event, context) => {
 
             // Consulta para obtener alumnos asignados al entrenador con `staff_id`
             const sql = `
-              SELECT c.client_id idusuario, c.names as alumno, s.names as entrenador, 
-                     l.name as sede, m.name as membership 
-              FROM t_clients as c 
-              INNER JOIN t_staff as s ON s.staff_id = c.staff_id 
-              INNER JOIN t_locations as l ON l.location_id = c.location_id 
-              INNER JOIN t_memberships as m ON m.membership_id = c.membership_id 
-              WHERE s.staff_id = $1`;
+            SELECT c.client_id AS client_id, CONCAT(c.names, ' ', c.father_last_name, ' ', c.mother_last_name) AS nombres, CONCAT(s.names, ' ', s.father_last_name, ' ', s.mother_last_name) AS entrenador, l.name AS sede, m.name AS membresia, 'Sin rango' AS rango FROM t_clients AS c INNER JOIN t_staff AS s ON s.staff_id = c.staff_id
+            INNER JOIN t_locations AS l ON l.location_id = c.location_id INNER JOIN t_memberships AS m ON m.membership_id = c.membership_id WHERE s.staff_id = $1`;
             const result = await query(sql, [staff_id]);
 
             // Verificar si no se encontraron registros
@@ -188,9 +183,9 @@ export const handler = async (event, context) => {
             // Consulta para obtener body metrics por `client_id`
             const sql = `
               SELECT b.client_id as idusuario, b.height as altura, b.weight as peso, 
-                     b.right_bicep_cm as bicepderecho, b.left_bicep_cm as bicepizquierdo, 
-                     b.right_thigh as musloderecho, b.left_thigh as musloizquierdo, 
-                     b.waist as cintura, b.hips as cadera, b.created_at as generado 
+                     b.chest_cm as pecho, b.waist_cm as cintura, 
+                     b.hip_cm as cadera, b.arm_cm as brazo, 
+                     b.thigh_cm as muslo, b.shoulder_cm as hombro,  b.ideal_weight as peso_ideal,  b.created_at as generado 
               FROM t_clients as c 
               INNER JOIN t_body_metrics AS b ON b.client_id = c.client_id 
               WHERE c.client_id = $1`;
