@@ -1,0 +1,11 @@
+{
+  "name": "hu-tp-38-001",
+  "version": "1.0.0",
+  "description": "HU crear tratamiento",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "shirley tc",
+  "license": "ISC"
+}
