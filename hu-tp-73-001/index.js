@@ -3,6 +3,12 @@ import AWS from 'aws-sdk';
 import fetch from 'node-fetch';
 import { parse } from 'lambda-multipart-parser'; // Para procesar archivos
 
+// PENDIENTES
+// AGREGAR COMENTARIOS QUE SE AVISARON HACE TIEMPO URGENTE
+// LISTA DE LOS GENEROS | ID Y NOMBRE
+// LISTA DE LOS ROLES | ID Y NOMBRE
+// LISTA DE LOS LOCATIONS | ID Y NOMBRE 
+
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
 // Configuración de la conexión a PostgreSQL
@@ -177,7 +183,7 @@ export const handler = async (event) => {
       };
     }
 
-    const apiUrl = `https://apiperu.dev/api/dni/${document}?api_token=616976aa685120cf369324a5de495986c2d63e16833ce95a189db48a376c12f4`;
+    const apiUrl = `https://apiperu.dev/api/dni/${document}?api_token=4613b4644db7c498cc51661d6bca2f2e3060219a15c806599df113b1258fed17`;
 
     try {
       const response = await fetch(apiUrl);
