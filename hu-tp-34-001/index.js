@@ -19,7 +19,6 @@ const pool = new Pool({
   }
 });
 
-
 // Función Lambda para manejar la solicitud
 export const handler = async (event) => {
     console.log(event);
