@@ -1,6 +1,13 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
+// RESPONSABLE: Paolo Diaz
+// HISTORIA DE USUARIO: 28 - Generar plan de entrenmiento por dia
+// DESCRIPCION: Guarda registro de ejercicios por dia, luego se obtiene y se muestra
+// PATH: /api/plan-de-entrenamiento/hu-tp-28
+// METHODS: POST, GET
+
+
 // Configuración del cliente para conectarse a la base de datos PostgreSQL
 const pool = new Pool({
   user: 'fia_fit_user',
@@ -14,12 +21,11 @@ const pool = new Pool({
 });
 
 
-
 // Función Lambda para manejar la solicitud
 export const handler = async (event) => {
-    console.log(event)
-    const path = event.path; // Obtener el path para identificar la solicitud específica
-    const queryParams = event.queryStringParameters; // Obtener los parámetros de consulta (para GETs)
+    console.log(event);
+    const path = event.path;
+    const queryParams = event.queryStringParameters;
     
     // Método POST para insertar un plan de entrenamiento y ejercicios
     if (event.httpMethod === 'POST') {
@@ -38,10 +44,10 @@ export const handler = async (event) => {
             };
         }
 
-        const { training_plan_id, day, focus, exercises } = body;
+        const { training_plan_id, client_id, name, description, day, focus, exercises } = body;
 
         // Validación de los datos de entrada
-        if (!training_plan_id || !day || !focus || !Array.isArray(exercises)) {
+        if (!day || !focus || !Array.isArray(exercises)) {
             return {
                 statusCode: 400,
                 headers: {
@@ -54,6 +60,23 @@ export const handler = async (event) => {
         }
 
         try {
+            // Iniciar la transacción
+            await pool.query('BEGIN');
+
+            let newTrainingPlanId = training_plan_id;
+
+            // Si no se recibe `training_plan_id`, insertar un nuevo plan
+            if (!newTrainingPlanId || newTrainingPlanId === '') {
+                const insertTrainingPlanQuery = `
+                INSERT INTO t_training_plans (client_id, name, description)
+                VALUES ($1, $2, $3)
+                RETURNING training_plan_id;
+                `;
+                const trainingPlansValues = [client_id, name || "", description || ""];
+                const trainingPlanResult = await pool.query(insertTrainingPlanQuery, trainingPlansValues);
+                newTrainingPlanId = trainingPlanResult.rows[0].training_plan_id;
+            }
+
             // Insertar en la tabla t_plan_days
             const insertPlanDayQuery = `
                 INSERT INTO t_plan_days (training_plan_id, day, focus, created_at, updated_at)
@@ -61,13 +84,12 @@ export const handler = async (event) => {
                 RETURNING plan_day_id;
             `;
             const planDayValues = [
-                training_plan_id,
+                newTrainingPlanId,
                 day,
                 focus,
                 new Date().toISOString(),  // created_at
                 new Date().toISOString()   // updated_at
             ];
-
             const planDayResult = await pool.query(insertPlanDayQuery, planDayValues);
             const newPlanDayId = planDayResult.rows[0].plan_day_id;
 
@@ -90,6 +112,9 @@ export const handler = async (event) => {
                 await pool.query(insertExerciseQuery, exerciseValues);
             }
 
+            // Confirmar la transacción
+            await pool.query('COMMIT');
+
             return {
                 statusCode: 200,
                 headers: {
@@ -100,6 +125,8 @@ export const handler = async (event) => {
                 body: JSON.stringify({ message: "Datos registrados correctamente", plan_day_id: newPlanDayId }),
             };
         } catch (err) {
+            // En caso de error, hacer rollback de la transacción
+            await pool.query('ROLLBACK');
             console.error('Error al registrar los datos:', err.message);
 
             return {
@@ -116,7 +143,6 @@ export const handler = async (event) => {
 
     // Método GET para obtener los tipos de ejercicio para el ComboBox
     if (event.httpMethod === 'GET' && queryParams != null && queryParams.exerciseTypes == "1") {
-        console.log("getExerciseTypes")
         try {
             const query = `
                 SELECT exercise_type_id, name 
@@ -149,10 +175,10 @@ export const handler = async (event) => {
         }
     }
     
-    if (event.httpMethod === 'GET' && queryParams.exercise_type_id != null ) {
-        const { exercise_type_id } = queryParams; // Tomar el parámetro de consulta `exercise_type_id`
+    // Método GET para obtener ejercicios filtrados por tipo
+    if (event.httpMethod === 'GET' && queryParams.exercise_type_id != null) {
+        const { exercise_type_id } = queryParams; 
 
-        // Verificar si el parámetro está presente
         if (!exercise_type_id) {
             return {
                 statusCode: 400,
@@ -166,7 +192,6 @@ export const handler = async (event) => {
         }
 
         try {
-            // Consulta para obtener los ejercicios filtrados por `exercise_type_id`
             const query = `
                 SELECT *
                 FROM t_exercises
@@ -182,7 +207,7 @@ export const handler = async (event) => {
                     'Access-Control-Allow-Headers': 'Content-Type',
                     'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT'
                 },
-                body: JSON.stringify(result.rows), // Enviar los ejercicios filtrados
+                body: JSON.stringify(result.rows), 
             };
         } catch (err) {
             console.error('Error al obtener los ejercicios por tipo:', err.message);
@@ -199,13 +224,9 @@ export const handler = async (event) => {
         }
     }
     
-    // Método GET para obtener ejercicios filtrados por tipo
+    // Método GET para obtener todos los ejercicios
     if (event.httpMethod === 'GET') {
-
-        // Verificar si el parámetro está presente
-
         try {
-            // Consulta para obtener los ejercicios filtrados por `exercise_type_id`
             const query = `
                 SELECT *
                 FROM t_exercises
@@ -219,7 +240,7 @@ export const handler = async (event) => {
                     'Access-Control-Allow-Headers': 'Content-Type',
                     'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT'
                 },
-                body: JSON.stringify(result.rows), // Enviar los ejercicios filtrados
+                body: JSON.stringify(result.rows), 
             };
         } catch (err) {
             console.error('Error al obtener los ejercicios por tipo:', err.message);
@@ -235,6 +256,4 @@ export const handler = async (event) => {
             };
         }
     }
-    
 };
-

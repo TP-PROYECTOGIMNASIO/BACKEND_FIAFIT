@@ -1,5 +1,12 @@
 import pkg from 'pg';
 
+// RESPONSABLE: Paolo Diaz 
+// HISTORIA DE USUARIO: 17 - VISUALIZAR ARTICULOS EN LINEA
+// DESCRIPCION: Obtieene los datos mediante una API
+// PATH: /api/productos/hu-tp-17
+// METHODS: GET
+
+
 // Configuración de la conexión
 const pool = new pkg.Pool({
   user: 'fia_fit_user',
@@ -14,8 +21,8 @@ const pool = new pkg.Pool({
 
 export const handler = async (event) => {
   try {
-    // Consigue el id y el nombre del producto
-    const productTypeId = event.queryStringParameters?.product_type_id;
+    // Consigue el id y el nombre del tipo de producto
+    const productTypeName = event.queryStringParameters?.product_type_name;
     const productName = event.queryStringParameters?.product_name;
 
     let query;
@@ -23,22 +30,42 @@ export const handler = async (event) => {
     let index = 1;  // Variable para controlar los índices de los valores en la consulta SQL
 
     // Construcción dinámica de la consulta
-    if (productTypeId && productName) {
-      // Filtrar por product_type_id y product_name
-      query = 'SELECT * FROM t_products WHERE product_type_id = $1 AND LOWER(product_name) LIKE $2 ORDER BY product_name ASC';
-      values.push(productTypeId);
+    if (productTypeName && productName) {
+      // Filtrar por product_type_name y product_name
+      query = `
+        SELECT p.*, p.product_name AS name, pt.product_type_name AS category
+        FROM t_products p
+        JOIN t_product_types pt ON p.product_type_id = pt.product_type_id
+        WHERE LOWER(pt.product_type_name) LIKE $${index++} 
+          AND LOWER(p.product_name) LIKE $${index++} 
+        ORDER BY p.product_name ASC`;
+      values.push(`%${productTypeName.toLowerCase()}%`);
       values.push(`%${productName.toLowerCase()}%`);
-    } else if (productTypeId) {
-      // Filtrar solo por product_type_id
-      query = 'SELECT * FROM t_products WHERE product_type_id = $1 ORDER BY product_name ASC';
-      values.push(productTypeId);
+    } else if (productTypeName) {
+      // Filtrar solo por product_type_name
+      query = `
+        SELECT p.*, p.product_name AS name, pt.product_type_name AS category
+        FROM t_products p
+        JOIN t_product_types pt ON p.product_type_id = pt.product_type_id
+        WHERE LOWER(pt.product_type_name) LIKE $${index++}
+        ORDER BY p.product_name ASC`;
+      values.push(`%${productTypeName.toLowerCase()}%`);
     } else if (productName) {
       // Filtrar solo por nombre del producto
-      query = 'SELECT * FROM t_products WHERE LOWER(product_name) LIKE $1 ORDER BY product_name ASC';
+      query = `
+        SELECT p.*, p.product_name AS name, pt.product_type_name AS category
+        FROM t_products p
+        JOIN t_product_types pt ON p.product_type_id = pt.product_type_id
+        WHERE LOWER(p.product_name) LIKE $${index++}
+        ORDER BY p.product_name ASC`;
       values.push(`%${productName.toLowerCase()}%`);
     } else {
       // Si no se proporciona ningún filtro, devolver todos los productos
-      query = 'SELECT * FROM t_products ORDER BY product_name ASC';
+      query = `
+        SELECT p.*, p.product_name AS name, pt.product_type_name AS category
+        FROM t_products p
+        JOIN t_product_types pt ON p.product_type_id = pt.product_type_id
+        ORDER BY p.product_name ASC`;
     }
 
     const result = await pool.query(query, values);
@@ -51,7 +78,7 @@ export const handler = async (event) => {
           'Access-Control-Allow-Headers': 'Content-Type',  // Permitir ciertos encabezados
           'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permitir ciertos métodos HTTP
         },
-        body: JSON.stringify({ message: 'Tipo de producto no encontrado' }),
+        body: JSON.stringify({ message: 'Producto no encontrado' }),
       };
     }
 
