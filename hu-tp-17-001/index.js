@@ -6,7 +6,6 @@ import pkg from 'pg';
 // PATH: /api/productos/hu-tp-17
 // METHODS: GET
 
-
 // Configuración de la conexión
 const pool = new pkg.Pool({
   user: 'fia_fit_user',
