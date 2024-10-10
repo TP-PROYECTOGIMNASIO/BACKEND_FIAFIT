@@ -3,6 +3,12 @@ import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
 
+//RESPONSABLE:JORGE LOPEZ
+//HISTORIA DE USUARIO:62 - VISUALIZAR REPORTE DE COMPRA - MANAGER
+//DESCRIPCION: LISTA LOS REPORTES DE COMPRA Y SUS DETALLES
+//PATH: /compras/hu-tp-62
+//METHODS: POST
+
 const { Client } = pg;
 
 export const handler = async (event) => {
@@ -101,7 +107,8 @@ const filtrarInformes = async (client, ordenarPor, orden, unidadTemporal) => {
     if (unidadTemporal) {
         switch (unidadTemporal) {
             case 'dia':
-                query += " AND DATE_TRUNC('day', assignment_date) = DATE_TRUNC('day', CURRENT_DATE)";
+                // Obtener la fecha del último registro insertado
+                query += "";
                 break;
             case 'mes':
                 query += " AND EXTRACT(MONTH FROM assignment_date) = EXTRACT(MONTH FROM CURRENT_DATE)";
