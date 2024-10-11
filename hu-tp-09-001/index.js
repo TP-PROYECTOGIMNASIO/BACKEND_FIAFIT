@@ -39,12 +39,7 @@ export async function handler(event) {
     },
   });
 
-  const locations = {
-    1: { latitude: -12.1423717, longitude: -76.995523 },  // Ubicación actual de Fabian (Frontend) para casos de prueba
-    2: { latitude: -12.0350, longitude: -77.0150 },  // Sucursal Norte
-    3: { latitude: -12.0560, longitude: -77.0450 },  // Sucursal Sur
-    4: { latitude: -12.0500, longitude: -77.0400 },  // Sede 1
-  };
+  
 
   try {
     await client.connect();
@@ -65,19 +60,23 @@ export async function handler(event) {
       }
 
       const location_id = staffLocation.location_id;
-      const workLocation = locations[location_id];
+      
+      // Obtener la latitud y longitud de la ubicación del empleado desde t_locations
+    const locationQuery = `SELECT lat, long FROM t_locations WHERE location_id = $1`;
+    const locationResult = await client.query(locationQuery, [location_id]);
+    const workLocation = locationResult.rows[0];
 
-      if (!workLocation) {
-        return {
-          statusCode: 404,
-          body: JSON.stringify({ message: 'Ubicación del empleado no encontrada' }),
-        };
-      }
+    if (!workLocation) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Ubicación del empleado no encontrada' }),
+      };
+    }
 
-      // Calcular la distancia entre la ubicación actual y la ubicación de trabajo
-      const distance = getDistanceFromLatLonInKm(
-        latitude, longitude, workLocation.latitude, workLocation.longitude
-      );
+       // Calcular la distancia entre la ubicación actual y la ubicación de trabajo
+    const distance = getDistanceFromLatLonInKm(
+      latitude, longitude, workLocation.lat, workLocation.long
+    );
 
       // Validar si la distancia está dentro de un rango aceptable para el check-in (ejemplo: 15 metros)
       if (distance <= 0.015) {
