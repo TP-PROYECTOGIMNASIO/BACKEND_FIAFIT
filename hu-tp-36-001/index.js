@@ -6,16 +6,14 @@ const { Client } = pkg;
 //HISTORIA DE USUARIO:36 - PLAN DE NUTRICION - VISTA NUTRICIONISTA
 //DESCRIPCION: LISTA EL DETALLE DEL PLAN DE NUTRICION
 //PATH: /plan-de-nutricion/hu-tp-36
-//METHODS: POST
-
-// Variable global para almacenar productos temporalmente
-let productosTemporales = [];
+//METHODS: GET
 
 export const handler = async (event) => {
-    console.log(event)
+    console.log(event);
     const { httpMethod } = event;
     const queryParams = event.queryStringParameters || {};  // Obtener los parámetros de la URL
-    console.log(httpMethod)
+    console.log(httpMethod);
+    
     if (httpMethod != 'GET') {
         return {
             statusCode: 405,
@@ -70,31 +68,55 @@ export const handler = async (event) => {
             };
         }
 
-        // Si no hay dietPlanId, obtener el último plan de nutrición
-        const lastDietPlanResult = await client.query('SELECT * FROM t_diet_plans ORDER BY created_at DESC LIMIT 1');
-        const lastDietPlan = lastDietPlanResult.rows[0];
+        // Si el parámetro showAll=true está presente, obtenemos todos los planes anteriores menos el más reciente
+        if (queryParams.showAll && queryParams.showAll === 'true') {
+            const allDietPlansResult = await client.query('SELECT * FROM t_diet_plans ORDER BY created_at DESC OFFSET 1');
+            const allDietPlans = allDietPlansResult.rows;
 
-        if (!lastDietPlan) {
+            if (allDietPlans.length === 0) {
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({ message: 'No hay planes de nutrición anteriores.' }),
+                };
+            }
+
+            // Retornar todos los planes anteriores
             return {
-                statusCode: 404,
-                body: JSON.stringify({ message: 'No se encontró ningún plan de nutrición.' }),
+                statusCode: 200,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT',
+                },
+                body: JSON.stringify(allDietPlans),
+            };
+        } else {
+            // Obtener el último plan de nutrición
+            const lastDietPlanResult = await client.query('SELECT * FROM t_diet_plans ORDER BY diet_assignment_date DESC LIMIT 1');
+            const lastDietPlan = lastDietPlanResult.rows[0];
+
+            if (!lastDietPlan) {
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({ message: 'No se encontró ningún plan de nutrición.' }),
+                };
+            }
+
+            // Obtener los días del último plan
+            const dietPlanDaysResult = await client.query('SELECT * FROM t_diet_plan_days WHERE diet_plan_id = $1', [lastDietPlan.diet_plan_id]);
+            const dietPlanDays = dietPlanDaysResult.rows;
+
+            // Retornar el último plan y los días correspondientes
+            return {
+                statusCode: 200,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT',
+                },
+                body: JSON.stringify({ ...lastDietPlan, days: dietPlanDays }),
             };
         }
-
-        // Obtener los días del último plan
-        const dietPlanDaysResult = await client.query('SELECT * FROM t_diet_plan_days WHERE diet_plan_id = $1', [lastDietPlan.diet_plan_id]);
-        const dietPlanDays = dietPlanDaysResult.rows;
-
-        // Retornar el último plan y los días correspondientes
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT',
-            },
-            body: JSON.stringify({ ...lastDietPlan, days: dietPlanDays }),
-        };
 
     } catch (error) {
         return {
