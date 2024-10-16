@@ -23,6 +23,8 @@ export async function handler(event) {
     },
   });
 
+  console.log("Hola");
+
   try {
     // Conecta al cliente de PostgreSQL
     await client.connect();
@@ -31,13 +33,15 @@ export async function handler(event) {
     if (event.httpMethod === 'POST') {
       // Analiza los datos del formulario multipart
       const formData = await parse(event);
-      // Extrae los campos necesarios del formulario
-      const { name, address } = formData;
-      // Extrae el archivo del formulario
-      const file = formData.files[0];
 
-      // Verifica que los campos 'name' y 'address' estén presentes
-      if (!name || !address) {
+      // Extrae los campos necesarios del formulario se añadieron latitud y longitud
+      const { name, departamento, provincia, distrito, lat, long } = formData;
+
+      // Concatenar departamento, provincia y distrito en una sola cadena para el campo 'address'
+      const address = `${departamento}, ${provincia}, ${distrito}`;
+
+      // Verifica que los campos 'name', 'departamento', 'provincia', 'distrito', 'lat' y 'long' estén presentes
+      if (!name || !departamento || !provincia || !distrito || !lat || !long) {
         return {
           statusCode: 400, // Código de estado HTTP para solicitud incorrecta
           headers: {
@@ -45,9 +49,12 @@ export async function handler(event) {
             'Access-Control-Allow-Headers': 'Content-Type',  // Permite ciertos encabezados
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT' // Permite ciertos métodos HTTP
           },
-          body: JSON.stringify({ error: 'Los campos "name" y "address" son requeridos.' }),
+          body: JSON.stringify({ error: 'Los campos "name", "departamento", "provincia", "distrito", "lat" y "long" son requeridos.' }),
         };
       }
+
+      // Extrae el archivo del formulario
+      const file = formData.files[0];
 
       // Verifica si se ha subido un archivo
       let imageUrl = null;
@@ -71,10 +78,10 @@ export async function handler(event) {
 
       // Define la consulta SQL para insertar un nuevo registro en la base de datos
       const query = `
-        INSERT INTO t_locations (name, address, image_url, status, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *`;
+        INSERT INTO t_locations (name, address, image_url, lat, long, active, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, True, NOW(), NOW()) RETURNING *`;
       // Define los valores a insertar en la base de datos
-      const values = [name, address, imageUrl, true]; // 'true' para el campo 'status'
+      const values = [name, address, imageUrl, lat, long];
 
       // Ejecuta la consulta en la base de datos
       const result = await client.query(query, values);
