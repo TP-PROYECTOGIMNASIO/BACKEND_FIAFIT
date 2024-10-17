@@ -27,6 +27,15 @@ const headers = {
     'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT,PATCH', // Permitir ciertos métodos HTTP
 };
 
+
+const clientTable = 't_clients';
+const clietMembershipsTable = 't_client_memberships'
+const dietPlansTable = 't_diet_plans'
+const membershipsTable = 't_memberships'
+const gendersTable = 't_genders'
+const bodyMetricsTable = 't_body_metrics';
+const goalsTable = 't_goals'
+
 // Función principal manejadora del evento
 export const handler = async (event) => {
     const { httpMethod, queryStringParameters } = event;
@@ -70,7 +79,6 @@ export const handler = async (event) => {
 
 // Función que busca un cliente por su client_id
 async function findClientById(clientId) {
-    const clientTable = 't_clients';
 
     try {
         // Consulta para buscar el cliente por su client_id
@@ -86,8 +94,11 @@ async function findClientById(clientId) {
                 phone_number,
                 address,
                 city,
-                country
-            FROM ${clientTable}
+                country,
+                E.gender
+            FROM ${clientTable} as A
+            left join ${gendersTable} as E
+            on E.gender_id = A.gender_id
             WHERE client_id = $1
         `;
         const clientResult = await pool.query(clientQuery, [clientId]);
@@ -103,23 +114,37 @@ async function findClientById(clientId) {
         // Obtener los detalles del cliente
         const client = clientResult.rows[0];
 
+        const bodyMetricsQuery = `
+            SELECT 
+                body_metric_id,
+                metric_date,
+                height,
+                weight,
+                chest_cm,
+                waist_cm,
+                hip_cm,
+                arm_cm,
+                thigh_cm,
+                shoulder_cm,
+                ideal_weight,
+                imc,
+                B.name as goals
+            FROM ${bodyMetricsTable} as A
+            left join ${goalsTable} as B
+            on A.goal_id = B.goal_id 
+            WHERE client_id = $1
+            ORDER BY metric_date DESC
+            LIMIT 1
+        `;
+        
+        const bodyMetricsResult = await pool.query(bodyMetricsQuery, [clientId]);
+
         const responseBody = {
-            client: {
-                id: client.client_id,
-                names: client.names,
-                father_last_name: client.father_last_name,
-                mother_last_name: client.mother_last_name,
-                document: client.document,
-                image_url: client.image_url, // URL de la imagen del cliente
-                mail: client.mail,
-                phone_number: client.phone_number,
-                address: client.address,
-                city: client.city,
-                country: client.country
-            }
+            client: client,
+            body_metrics: bodyMetricsResult.rowCount > 0 ? bodyMetricsResult.rows[0] : 'No hay métricas corporales disponibles para este cliente'
         };
 
-        return {
+        return {    
             statusCode: 200,
             headers,
             body: JSON.stringify(responseBody),
@@ -135,8 +160,6 @@ async function findClientById(clientId) {
 
 // Función que busca un usuario por su documento (DNI) y muestra sus últimas métricas corporales
 async function findUserAndLatestBodyMetricsByDni(doc) {
-    const clientTable = 't_clients';
-    const bodyMetricsTable = 't_body_metrics';
 
     try {
         // Buscar el cliente por DNI
@@ -147,8 +170,11 @@ async function findUserAndLatestBodyMetricsByDni(doc) {
                 father_last_name,
                 mother_last_name,
                 document,
-                image_url
+                image_url,
+                E.gender
             FROM ${clientTable}
+            left join ${gendersTable} as E
+            on E.gender_id = B.gender_id
             WHERE document = $1
         `;
         const clientResult = await pool.query(clientQuery, [doc]);
@@ -164,32 +190,6 @@ async function findUserAndLatestBodyMetricsByDni(doc) {
         // Si el cliente existe, obtener su última métrica corporal
         const client = clientResult.rows[0];
         const clientId = client.client_id;
-
-        const bodyMetricsQuery = `
-            SELECT 
-                body_metric_id,
-                metric_date,
-                height,
-                weight,
-                chest_cm,
-                waist_cm,
-                hip_cm,
-                arm_cm,
-                thigh_cm,
-                shoulder_cm,
-                ideal_weight,
-                imc
-            FROM ${bodyMetricsTable}
-            WHERE client_id = $1
-            ORDER BY metric_date DESC
-            LIMIT 1
-        `;
-        const bodyMetricsResult = await pool.query(bodyMetricsQuery, [clientId]);
-
-        const responseBody = {
-            client: client,
-            body_metrics: bodyMetricsResult.rowCount > 0 ? bodyMetricsResult.rows[0] : 'No hay métricas corporales disponibles para este cliente'
-        };
 
         return {
             statusCode: 200,
@@ -207,24 +207,35 @@ async function findUserAndLatestBodyMetricsByDni(doc) {
 
 // Función que busca clientes por tipo de membresía
 async function findClientsByMembership(membershipId) {
-    const clientMembershipTable = 't_client_memberships';
-    const clientTable = 't_clients';
 
     try {
         // Consulta para obtener los clientes que tienen una membresía específica
         const membershipQuery = `
-            SELECT 
-                c.client_id,
-                c.names,
-                c.father_last_name,
-                c.mother_last_name,
-                c.document,
-                cm.membership_id,
-                cm.membership_start_date,
-                cm.payment_frequency_months
-            FROM ${clientMembershipTable} cm
-            JOIN ${clientTable} c ON cm.client_id = c.client_id
-            WHERE cm.membership_id = $1
+            select
+            A.client_id,
+            CONCAT(B.names,' ',B.father_last_name,' ',B.mother_last_name) as names,
+            E.gender,
+            B.document,
+            A.membership_id,
+            C.name as membership_name,
+            D.start_date,
+            D.end_date,
+                CASE 
+                    WHEN D.end_date IS NULL THEN 'No Generado'
+                    WHEN CURRENT_TIMESTAMP > D.end_date THEN 'Vencido'
+                    WHEN CURRENT_TIMESTAMP BETWEEN D.start_date AND D.end_date THEN 'Vigente'
+                END AS plan_diet_status
+            from ${clietMembershipsTable} as A
+            inner join ${clientTable} as B
+            on B.client_id = A.client_id
+            inner join ${membershipsTable} as C
+            on A.membership_id = C.membership_id
+            left join ${dietPlansTable} as D
+            on A.client_id = D.client_id
+            left join ${gendersTable} as E
+            on E.gender_id = B.gender_id 
+            where C.name in ('Black', 'Premium')
+            and C.membership_id = $1 
         `;
         const result = await pool.query(membershipQuery, [membershipId]);
 
@@ -252,34 +263,60 @@ async function findClientsByMembership(membershipId) {
 
 // Función que lista todos los usuarios (clientes)
 async function listAllUsers() {
-    const clientTable = 't_clients';
 
     try {
         // Consulta para obtener todos los clientes
         const allUsersQuery = `
-            SELECT 
-                client_id,
-                names,
-                father_last_name,
-                mother_last_name,
-                document,
-                image_url
-            FROM ${clientTable}
+            select
+            A.client_id,
+            CONCAT(B.names,' ',B.father_last_name,' ',B.mother_last_name) as names,
+            E.gender,
+            B.document,
+            A.membership_id,
+            C.name as membership_name,
+            D.start_date,
+            D.end_date,
+                CASE 
+                    WHEN D.end_date IS NULL THEN 'No Generado'
+                    WHEN CURRENT_DATE > D.end_date THEN 'Vencido'
+                    WHEN CURRENT_DATE BETWEEN D.start_date AND D.end_date THEN 'Vigente'
+                END AS plan_diet_status
+            from ${clietMembershipsTable} as A
+            inner join ${clientTable} as B
+            on B.client_id = A.client_id
+            inner join ${membershipsTable} as C
+            on A.membership_id = C.membership_id
+            left join ${dietPlansTable} as D
+            on A.client_id = D.client_id
+            left join ${gendersTable} as E
+            on E.gender_id = B.gender_id
+            where C.name in ('Black', 'Premium')
         `;
-        const result = await pool.query(allUsersQuery);
+        const users = await pool.query(allUsersQuery);
 
-        if (result.rowCount === 0) {
+        if (users.rowCount === 0) {
             return {
                 statusCode: 404,
                 headers,
                 body: JSON.stringify({ message: 'No se encontraron clientes' }),
             };
         }
+        
+        const allMembershipsQuery = `
+            SELECT 
+                membership_id,
+                name
+            FROM ${membershipsTable}
+            WHERE name IN ('Black', 'Premium')
+        `;
+        const memberships = await pool.query(allMembershipsQuery);
+
+        console.log(memberships.rows)
 
         return {
             statusCode: 200,
             headers,
-            body: JSON.stringify(result.rows),
+            body: JSON.stringify({ users: users.rows, memberships: memberships.rows}),
         };
     } catch (error) {
         return {
@@ -289,3 +326,6 @@ async function listAllUsers() {
         };
     }
 }
+
+    
+    
