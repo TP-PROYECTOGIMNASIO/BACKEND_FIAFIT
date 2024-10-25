@@ -10,6 +10,13 @@ const { Client } = pkg;
 // Crea una instancia de S3 para manejar operaciones con Amazon S3
 const s3 = new AWS.S3();
 
+//CONTACTO: NIVARDO CANO
+//RESPONSABLE: NIVARDO CANO
+//HISTORIA DE USUARIO: 76 - REGISTRAR SEDES
+//DESCRIPCION: Mejorar la gestión de sedes actuales
+//PATH: api/planillas-por-sedes/hu-tp-76
+//METHODS: POST
+// TABLAS UTILIZADAS: t_locations
 export async function handler(event) {
   // Configura el cliente de PostgreSQL con los parámetros de conexión
   const client = new Client({
@@ -133,3 +140,9 @@ export async function handler(event) {
     }
   }
 }
+
+/*API DE GOOGLE MAPS
+https://github.com/yasseram1/api-google-maps-test/tree/main
+VITE_API_KEY="AIzaSyDHaYU-i1o6tNh3Cic8aXRETgde7qL5W-4"
+VITE_MAP_ID="23e9d71b4b149c7"
+*/
