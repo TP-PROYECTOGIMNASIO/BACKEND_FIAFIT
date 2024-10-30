@@ -1,0 +1,28 @@
+{
+  "name": "hu-tp-21-001",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "hu-tp-18-001": "file:",
+    "hu-tp-21-001": "file:",
+    "lambda-multipart-parser": "^1.0.1",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.6",
+    "@babel/preset-env": "^7.24.3",
+    "babel-jest": "^28.1.2",
+    "jest": "^28.1.3",
+    "supertest": "^6.2.4"
+  }
+}
