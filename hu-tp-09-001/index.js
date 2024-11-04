@@ -1,11 +1,10 @@
 import pkg from 'pg';
-import fetch from 'node-fetch';
 
 // RESPONSABLE: Nadin Asin
 // HISTORIA DE USUARIO: 09 - Realizar check-in como empleado
-// DESCRIPCION: Permite a los empleados registrar su check-in al enviar su ubicación actual (latitud y longitud). La API valida si el empleado está en su ubicación de trabajo registrada y, si es correcto, registra la hora de entrada.
+// DESCRIPCIÓN: Este código permite a los empleados registrar su check-in al enviar su ubicación actual (latitud y longitud) mediante un método POST. La API valida si el empleado está en su ubicación de trabajo registrada (usando la tabla `t_locations`), y, si es correcto, registra la hora de entrada en `t_staff_attendances`. Adicionalmente, mediante un método GET, la API permite obtener las coordenadas (latitud y longitud) de la sede asignada al empleado.
 // PATH: /api/check-in-empleados/hu-tp-09
-// METHODS: POST
+// METHODS: POST, GET
 
 
 const { Client } = pkg;
@@ -39,10 +38,55 @@ export async function handler(event) {
     },
   });
 
-  
+
 
   try {
     await client.connect();
+
+    // Nueva funcionalidad para manejar solicitudes GET
+    if (event.httpMethod === 'GET') {
+      const { employee_id } = event.queryStringParameters;
+
+      // Obtener la localización del empleado desde t_staff
+      const staffQuery = `SELECT location_id FROM t_staff WHERE staff_id = $1`;
+      const staffResult = await client.query(staffQuery, [employee_id]);
+      const staffLocation = staffResult.rows[0];
+
+      if (!staffLocation) {
+        return {
+          statusCode: 404,
+          body: JSON.stringify({ message: 'Empleado no encontrado' }),
+        };
+      }
+
+      const location_id = staffLocation.location_id;
+
+      // Obtener la latitud y longitud de la sede desde t_locations
+      const locationQuery = `SELECT lat, long FROM t_locations WHERE location_id = $1`;
+      const locationResult = await client.query(locationQuery, [location_id]);
+      const workLocation = locationResult.rows[0];
+
+      if (!workLocation) {
+        return {
+          statusCode: 404,
+          body: JSON.stringify({ message: 'Ubicación del empleado no encontrada' }),
+        };
+      }
+
+      // Devolver la latitud y longitud de la sede
+      return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+        },
+        body: JSON.stringify({
+          lat: workLocation.lat,
+          long: workLocation.long,
+        }),
+      };
+    }
 
     if (event.httpMethod === 'POST') {
       const { employee_id, latitude, longitude } = JSON.parse(event.body);
@@ -60,23 +104,23 @@ export async function handler(event) {
       }
 
       const location_id = staffLocation.location_id;
-      
+
       // Obtener la latitud y longitud de la ubicación del empleado desde t_locations
-    const locationQuery = `SELECT lat, long FROM t_locations WHERE location_id = $1`;
-    const locationResult = await client.query(locationQuery, [location_id]);
-    const workLocation = locationResult.rows[0];
+      const locationQuery = `SELECT lat, long FROM t_locations WHERE location_id = $1`;
+      const locationResult = await client.query(locationQuery, [location_id]);
+      const workLocation = locationResult.rows[0];
 
-    if (!workLocation) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ message: 'Ubicación del empleado no encontrada' }),
-      };
-    }
+      if (!workLocation) {
+        return {
+          statusCode: 404,
+          body: JSON.stringify({ message: 'Ubicación del empleado no encontrada' }),
+        };
+      }
 
-       // Calcular la distancia entre la ubicación actual y la ubicación de trabajo
-    const distance = getDistanceFromLatLonInKm(
-      latitude, longitude, workLocation.lat, workLocation.long
-    );
+      // Calcular la distancia entre la ubicación actual y la ubicación de trabajo
+      const distance = getDistanceFromLatLonInKm(
+        latitude, longitude, workLocation.lat, workLocation.long
+      );
 
       // Validar si la distancia está dentro de un rango aceptable para el check-in (ejemplo: 15 metros)
       if (distance <= 0.015) {
