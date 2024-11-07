@@ -1,6 +1,12 @@
 import pkg from 'pg';
 const { Client } = pkg;
 
+//RESPONSABLE:JORGE LOPEZ
+//HISTORIA DE USUARIO:27 - CREAR PLAN DE ENTRENAMIENTO - VISTA ENTRENADOR
+//DESCRIPCION: CREA EL PLAN DE ENTRENAMIENTO
+//PATH: plan-de-entrenamiento/hu-tp-27
+//METHODS: POST
+
 export const handler = async (event) => {
     const method = event.httpMethod;
     let requestBody;
@@ -52,17 +58,18 @@ export const handler = async (event) => {
         // 1. Obtener el plan de entrenamiento del cliente basado en t_plan_days
         const planQuery = `
             SELECT 
-                plan_day_id, 
-                training_plan_id, 
-                day, 
-                focus
+                pd.training_plan_day_id, 
+                pd.training_plan_id, 
+                pd.day, 
+                pd.focus
             FROM 
-                t_plan_days
+                t_training_plan_days pd
+            JOIN 
+                t_training_plans tp ON pd.training_plan_id = tp.training_plan_id
             WHERE 
-                training_plan_id = $1
-                AND day = $2;
+                tp.client_id = 1$;
         `;
-        const resPlan = await client.query(planQuery, [client_id, day]);
+        const resPlan = await client.query(planQuery, [client_id]);
 
         if (resPlan.rows.length === 0) {
             return {
